@@ -1,6 +1,6 @@
-//Mr.Wang init
+//Mr.Wang code 
 //databus PB8-15
-
+//CS PA15, RS PA14, WR PA13, RESET PB2 
 
 int color[]={0xf100,0x07e0,0x001f,0xffff};  //bl,gn,rd,wh
 
@@ -27,14 +27,13 @@ if (i>=16384) lcdData(color[2]);
 }  digitalWrite(PA15,1);
  
  digitalWrite(PA15,0);
- //wrBus(0x42); wrBus(100); wrBus(101); wrBus(0x43); wrBus(100); wrBus(101);
+ 
  digitalWrite(PA15,1);
- //wrData(0);
+
 }
 
 void loop() {
-  //if ( ! mfrc522.PICC_IsNewCardPresent()) return;if ( ! mfrc522.PICC_ReadCardSerial()) return;mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
- //for (int i=0; i<256; i++) wrBus(i);
+
 }
 
 void wrBus2(int d1, int d2) {
@@ -60,7 +59,13 @@ GPIOB->regs->BSRR =0xFF000000 + (b<<8);
 digitalWrite(PA13,LOW);  //WR
 delayMicroseconds(10);
 digitalWrite(PA13,HIGH);  
-  }
+  }  
+
+void lcdData(int data)
+{ digitalWrite(PA14,1);//RS
+    wrBus(data /256);
+    wrBus(data & 0x00ff);
+}
 
  void initTFT(void){  //COG_C177MVHG_03_H
   digitalWrite(PB2,0); delay(10); digitalWrite(PB2,1);delay(10);
@@ -99,276 +104,6 @@ digitalWrite(PA13,HIGH);
   digitalWrite(PA14,1); //RS
 } 
   
-  void lcdData(int data)
-{ digitalWrite(PA14,1);//RS
-    wrBus(data /256);
-    wrBus(data & 0x00ff);
-}
-
-  /*Command($2C, LCD_ExectimeGfx);     // Standby Mode OFF
-Command16($0201, LCD_ExectimeGfx); // Oscillation Mode Set
-Command16($260F, LCD_ExectimeGfx); // DCDC and AMP ON/OFF set
-Command16($1030, LCD_ExectimeGfx); // Driver Output Mode Set
-Command16($2001, LCD_ExectimeGfx); // DC-DC Select
-Command16($2201, LCD_ExectimeGfx); // Bias Set
-Command16($2401, LCD_ExectimeGfx); // DCDC Clock Division Set
-Command16($2800, LCD_ExectimeGfx); // Temperature Compensation Set
-Command16($3040, LCD_ExectimeGfx); // Addressing Mode Set
-Command16($3201, LCD_ExectimeGfx); // ROW Vector Mode Set
-Command16($3482, LCD_ExectimeGfx); // N-line Inversion Set
-Command16($4000, LCD_ExectimeGfx); // Entry Mode Set
 
 
-if Contrast_ON then Command16($2A00 + 128 + ContrastValue div 2, LCD_ExectimeGfx) // Contrast
-               else Command16($2A00, LCD_ExectimeGfx); // Set contrast OFF
-#include "config.h"
-#include "cpu.h"
-#include "lcd.h"
-#include "kernel.h"
-#include "system.h"
-
-// Display status 
-static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
-
-//LCD command set for Samsung S6B33B2 
-#define R_NOP                  0x00
-#define R_OSCILLATION_MODE     0x02
-#define R_DRIVER_OUTPUT_MODE   0x10
-#define R_DCDC_SET             0x20
-#define R_BIAS_SET             0x22
-#define R_DCDC_CLOCK_DIV       0x24
-#define R_DCDC_AMP_ONOFF       0x26
-#define R_TEMP_COMPENSATION    0x28
-#define R_CONTRAST_CONTROL1    0x2a
-#define R_CONTRAST_CONTROL2    0x2b
-#define R_STANDBY_OFF          0x2c
-#define R_STANDBY_ON           0x2d
-#define R_DDRAM_BURST_OFF      0x2e
-#define R_DDRAM_BURST_ON       0x2f
-#define R_ADDRESSING_MODE      0x30
-#define R_ROW_VECTOR_MODE      0x32
-#define R_N_LINE_INVERSION     0x34
-#define R_FRAME_FREQ_CONTROL   0x36
-#define R_RED_PALETTE          0x38
-#define R_GREEN_PALETTE        0x3a
-#define R_BLUE_PALETTE         0x3c
-#define R_ENTRY_MODE           0x40
-#define R_X_ADDR_AREA          0x42
-#define R_Y_ADDR_AREA          0x43
-#define R_RAM_SKIP_AREA        0x45
-#define R_DISPLAY_OFF          0x50
-#define R_DISPLAY_ON           0x51
-#define R_SPEC_DISPLAY_PATTERN 0x53
-#define R_PARTIAL_DISPLAY_MODE 0x55
-#define R_PARTIAL_START_LINE   0x56
-#define R_PARTIAL_END_LINE     0x57
-#define R_AREA_SCROLL_MODE     0x59
-#define R_SCROLL_START_LINE    0x5a
-#define R_DATA_FORMAT_SELECT   0x60
-
-// TCC77x specific defines 
-#define LCD_BASE  0x50000000
-#define LCD_CMD   *(volatile unsigned char*)(LCD_BASE)
-#define LCD_DATA  *(volatile unsigned char*)(LCD_BASE+1)
-
-static void lcd_send_command(unsigned cmd)
-{
-    LCD_CMD = cmd;
-        
-    asm volatile (
-        "nop      \n\t"
-        "nop      \n\t"
-        "nop      \n\t"
-    );
-}
-
-static void lcd_send_data(unsigned data)
-{
-    LCD_DATA = (data & 0xff00) >> 8;
-    LCD_DATA = (data & 0x00ff);
-}
-
-void lcd_init_device(void)
-{
-    uint32_t bus_width;
-
-             
-             
-    GPIOE &= ~0x8;
-    sleep(HZ/100);   
-
-    GPIOE |= 0x08;
-    sleep(HZ/100);  
-    
-    lcd_send_command(R_STANDBY_OFF);
-    sleep(HZ/20);   
-
-    lcd_send_command(R_OSCILLATION_MODE);
-    lcd_send_command(0x01);
-    sleep(HZ/100);   
-
-    lcd_send_command(R_DCDC_AMP_ONOFF);
-    lcd_send_command(0x01);
-    sleep(HZ/100); 
-
-    lcd_send_command(R_DCDC_AMP_ONOFF);
-    lcd_send_command(0x09);
-    sleep(HZ/100);  
-
-    lcd_send_command(R_DCDC_AMP_ONOFF);
-    lcd_send_command(0x0b);
-    sleep(HZ/100);  
-    lcd_send_command(R_DCDC_AMP_ONOFF);
-    lcd_send_command(0x0f);
-    sleep(HZ/100); 
-
-    lcd_send_command(R_DCDC_SET);
-    lcd_send_command(0x01);
-    sleep(HZ/100);     
-    sleep(HZ/10);      
-
-    lcd_send_command(R_TEMP_COMPENSATION);
-    lcd_send_command(0x01);
-    sleep(HZ/100);    
-
-    lcd_send_command(R_DRIVER_OUTPUT_MODE);
-    lcd_send_command(0x03);
-
-    lcd_send_command(R_ENTRY_MODE);
-    lcd_send_command(0x81);
-
-    lcd_send_command(R_N_LINE_INVERSION);
-    lcd_send_command(0x04);
-    lcd_send_command(0xfa);
-    lcd_send_command(0x5f);
-
-    lcd_set_contrast(0x28);
-
-    lcd_send_command(R_SPEC_DISPLAY_PATTERN);
-    lcd_send_command(0x0);
-    sleep(HZ/100);   
-
-    lcd_send_command(R_ADDRESSING_MODE);
-    lcd_send_command(0x0);
-    sleep(HZ/100);   
-
-    lcd_send_command(R_PARTIAL_DISPLAY_MODE);
-    lcd_send_command(0x0);
-    sleep(HZ/100);    
-
-    lcd_send_command(R_X_ADDR_AREA);
-    lcd_send_command(0);
-    lcd_send_command(0x80);
-
-    lcd_send_command(R_Y_ADDR_AREA);
-    lcd_send_command(0x0);
-    lcd_send_command(0x80);
-
-    lcd_send_command(R_DISPLAY_ON);
-
-    lcd_send_command(R_SPEC_DISPLAY_PATTERN);
-    lcd_send_command(0x0);
-    
-    
-    lcd_clear_display();
-    lcd_update();
-}
-
-
-int lcd_default_contrast(void)
-{
-    return 0x28;
-}
-
-void lcd_set_contrast(int val)
-{
-    //val &= 0xFF;
-    lcd_send_command(R_CONTRAST_CONTROL1);
-    lcd_send_command(val);
-}
-
-void lcd_set_invert_display(bool yesno)
-{
-   
-    (void)yesno;
-}
-
-void lcd_set_flip(bool yesno)
-{
-    lcd_send_command(R_DRIVER_OUTPUT_MODE);
-    lcd_send_command(yesno ? 0x02 : 0x07);
-}
-
-void lcd_yuv_set_options(unsigned options)
-{
-    lcd_yuv_options = options;
-}
-
-void lcd_blit_yuv(unsigned char *const src[3],
-                  int src_x, int src_y, int stride,
-                  int x, int y, int width, int height)
-{
-    (void) src;
-    (void) src_x;
-    (void) src_y;
-    (void) stride;
-    (void) x;
-    (void) y;
-
-    return;
-
-}
-
-//Update the display.This must be called after all other LCD functions that change the display. 
-void lcd_update(void)
-{
-    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-}
-
-// Update a fraction of the display. 
-void lcd_update_rect(int x, int y, int width, int height)
-{
-    const fb_data *addr;
-    
-    if (x + width >= LCD_WIDTH)
-        width = LCD_WIDTH - x;
-    if (y + height >= LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
-        
-    if ((width <= 0) || (height <= 0))
-        return;
-
-    addr = &lcd_framebuffer[y][x];
-
-    if (width <= 1) {                    
-        lcd_send_command(R_ENTRY_MODE);  The X end address must be larger 
-        lcd_send_command(0x80);          that the X start address, so we 
-        lcd_send_command(R_X_ADDR_AREA); switch to vertical mode for 
-        lcd_send_command(x);             single column updates and set 
-        lcd_send_command(x + 1);          the window width to 2 
-    } else {
-        lcd_send_command(R_ENTRY_MODE);
-        lcd_send_command(0x82);
-        lcd_send_command(R_X_ADDR_AREA);
-        lcd_send_command(x);
-        lcd_send_command(x + width - 1);
-    }
-
-    lcd_send_command(R_Y_ADDR_AREA);
-    lcd_send_command(y);
-    lcd_send_command(y + height - 1);
-
-    NOP needed because on some c200s, the previous lcd_send_command is
-       interpreted as a separate command instead of part of R_Y_ADDR_AREA. 
-    lcd_send_command(R_NOP);
-
-    do {
-        int w = width;
-        do {
-            lcd_send_data(*addr++);
-        } while (--w > 0);
-        addr += LCD_WIDTH - width;
-    } while (--height > 0);
-}
-
-*/
+ 
