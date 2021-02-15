@@ -10,5 +10,6 @@ data sheet : http://spurtikus.de/wp-content/uploads/2017/03/controller_S6B33B3A.
 Rotation is achieved by registers 0x10 and 0x40 (see table in data sheet p.41)
 
 In the data sheet this controller's range is limited to 132x132 pixels (0x42 0x43 registers range 0-0x83). 
+
 Somehow it still can address 128x160 pixels if D1 (Y/X) in 0x40 is set right.
 
