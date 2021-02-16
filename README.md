@@ -1,6 +1,6 @@
 # STM32-Arduino-S6B33B3-Samsung-LCD-test
 
-Adafruit GFX support and text, limited rotation. Some but not all GFX functions tested and work well.
+Adafruit GFX support and text, limited rotation. Some but not all GFX functions tested to work well.
 
 A chinese vendor sells these displays at 0.99$ on Aliexp., controller could be a S6B33B3 or a variant of B2. 
 
