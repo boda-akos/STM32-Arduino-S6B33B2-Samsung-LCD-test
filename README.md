@@ -18,5 +18,10 @@ Update 16 Feb 2021 : Adafruit GFX seems to work. Note that the Adafruit cpp and 
 
 The zip-ed file contains the previous version, it can only do limited graphics.
 
-
+  digitalWrite(PB2,0);  //Reset
+  digitalWrite(PA15,0); //CS
+  digitalWrite(PA14,0); //RS
+  digitalWrite(PA13,1); //WR  
+  
+  PB8-PB15 Data bus D0-D7
 
