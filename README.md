@@ -21,9 +21,13 @@ the name was kept but do not mix up with the original.  Keep these files in a si
 The zip-ed file contains the previous version, it can only do limited graphics.
 
   PB2   //Reset   PB2 is used for boot, pull down with 100Kohm to GND, good for GPIO 
+  
   PA15  //CS     disableDebugPorts() enables these 3 pins for GPIO use!
+  
   PA14  //RS      _"_
+  
   PA13  //WR      If you use SWD or Jtag, take other pins.
+  
   
   PB8-PB15 Data bus D0-D7
 
