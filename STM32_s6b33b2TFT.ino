@@ -1,29 +1,27 @@
-//Mr.Wang's init list
+//Mr.Wang init
 //databus PB8-15
 //TFT chip is s6b33b3 !! 0x10 register -and more- differences to s6b33b2
-//Adafruit STM32 8bit library forked , modified  
-//Code is not cleaned, but works except
-//Some graphics - Todo list
 
-#include "Adafruit_TFTLCD_8bit_STM32.h"   //all files together in a single directory, easy debugging
+#include "Adafruit_TFTLCD_8bit_STM32.h" 
 Adafruit_TFTLCD_8bit_STM32 tft;
 int color[]={0xf100,0x07e0,0x001f,0xffff,YELLOW,MAGENTA};  //bl,gn,rd,wh
-int _height=160, _width=128;
+
+uint8_t conv2d(const char* p); 
+
+uint8_t hh=conv2d(__TIME__), mm=conv2d(__TIME__+3), ss=conv2d(__TIME__+6);  // Get H, M, S from compile time
 
 void setup() {
   disableDebugPorts();
   tft.begin();
-  //pinMode(PA13,OUTPUT); pinMode(PA14,OUTPUT); pinMode(PA15,OUTPUT); 
-  //pinMode(PB2,OUTPUT);
   for (byte i=PB8; i<=PB15; i++) pinMode(i,OUTPUT);
   
 	Serial.begin(9600); int i=0; 
-	while (i<99) Serial.println(i++);	//while Serial() does not work here	
+	while (i<99) Serial.println(i++);		
   delay(100);
- digitalWrite(PA15,0);  digitalWrite(PA14,1); 
- for (int i=0; i<128*160; i++) {
-  
-if (i<2048 ) lcdData(color[0]) ;
+ // tft.setRotation(0);
+  digitalWrite(PA15,0);  digitalWrite(PA14,1); 
+  for (int i=0; i<128*160; i++) {
+  if (i<2048 ) lcdData(color[0]) ;
 if (i<4096 && i>=2048) lcdData(color[1]); 
 if (i<8192 && i>=4096) {if (i>(4096 + 10*128) && i<(4096 + 11*128) )  lcdData(color[4]); else lcdData(0);} 
 if (i<10240 && i>=8192) lcdData(color[4]);
@@ -32,24 +30,62 @@ if (i<16384 && i>=12288) lcdData(color[5]); //lcdData(random(255)*256+random(255
 if (i>=16384) lcdData(color[2]); 
 }  
 
-tft.setCursor(30,30); 
-tft.setTextColor(BLACK,WHITE);
-tft.setTextSize(3);
-tft.print("Tolna");
 
-//for (int i=0; i<0x20*0x20; i++) lcdData(random(255)*256+random(255)); 
 
+
+tft.setRotation(1);
+tft.setCursor(10,10); 
+tft.setTextColor(WHITE,BLACK);tft.setTextWrap(1);
+tft.setTextSize(2); 
+
+tft.drawRoundRect(10,80,80,10,6,RED);
+tft.drawLine(10,80,80,100,BLUE);
+tft.drawCircle(10,80,8,BLUE);
+tft.setCursor(80,60);tft.print("Tolna"); 
+
+tft.drawFastHLine(5,5,150,CYAN);tft.drawFastHLine(5,6,150,CYAN);
+tft.drawFastVLine(5,5,120,BLACK);
+ delay(2000);
+tft.fillScreen(BLACK);
 }
 
 
 void loop(void){
-//tft.fillScreen(YELLOW);
-  //tft.setAddrWindow(100,100,120,120);
-  //for (int i=0; i<400; i++) lcdData(random(255)*256+random(255)); 
-  delay(500);
-  };
+static int i; 
+static int targetTime;
 
+  if (targetTime < millis()) {
+    targetTime = millis()+1000;
+    ss++;              // Advance second
+    if (ss==60) {
+      ss=0;
+      mm++;            // Advance minute
+      if(mm>59) {
+        mm=0;
+        hh++;          // Advance hour
+        if (hh>23) {
+          hh=0;
+        }
+      }
+  }
+  tft.setCursor(30,40); pr2(hh);tft.print(':');pr2(mm);tft.print(':');pr2(ss);
+  }
+}
 
+ uint8_t conv2d(const char* p) {
+  uint8_t v = 0;
+  if ('0' <= *p && *p <= '9')
+    v = *p - '0';
+  return 10 * v + *++p - '0';
+}
+
+void pr2(byte n)
+
+{
+  if (n<10) tft.print('0'); 
+  tft.print(n);
+  
+  }
 //==============================================================================================
 /*
 void wrCmd(int c) {
@@ -138,4 +174,158 @@ wrBus(d3);
 */
 
 
- 
+  /*
+
+// Sets the LCD address window 
+// Relevant to rect/screen fills and H/V lines.  Input coordinates are
+// assumed pre-sorted (e.g. x2 >= x1).
+
+void setAddrWindow(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
+{ 
+  digitalWrite(PA15,0);
+  digitalWrite(PA14,0); 
+wrBus3(0x42,x1,x2); 
+wrBus3(0x43,y1,y2);
+digitalWrite(PA15,1);
+}
+
+void flood(int color, int len)
+{
+ for (int i=0; i<len ; i++) lcdData(color);
+}
+
+void drawFastHLine(int16_t x, int16_t y, int16_t length, uint16_t color)
+{
+  int16_t x2;
+
+  // Initial off-screen clipping
+  if((length <= 0     ) ||
+     (y      <  0     ) || ( y                  >= _height) ||
+     (x      >= _width) || ((x2 = (x+length-1)) <  0      )) return;
+
+  if(x < 0) {        // Clip left
+    length += x;
+    x       = 0;
+  }
+  if(x2 >= _width) { // Clip right
+    x2      = _width - 1;
+    length  = x2 - x + 1;
+  }
+
+  setAddrWindow(x, y, x2, y);
+  flood(color, length);
+  setAddrWindow(0, 0, _width - 1, _height - 1);
+  
+}
+
+
+void drawFastVLine(int16_t x, int16_t y, int16_t length, uint16_t color)
+{
+  int16_t y2;
+
+  // Initial off-screen clipping
+  if((length <= 0      ) ||
+     (x      <  0      ) || ( x                  >= _width) ||
+     (y      >= _height) || ((y2 = (y+length-1)) <  0     )) return;
+  if(y < 0) {         // Clip top
+    length += y;
+    y       = 0;
+  }
+  if(y2 >= _height) { // Clip bottom
+    y2      = _height - 1;
+    length  = y2 - y + 1;
+  }
+
+  setAddrWindow(x, y, x, y2);
+  flood(color, length);
+  setAddrWindow(0, 0, _width - 1, _height - 1);
+  
+}
+
+
+void fillRect(int16_t x1, int16_t y1, int16_t w, int16_t h, uint16_t fillcolor)
+{
+  int16_t  x2, y2;
+
+  // Initial off-screen clipping
+  if( (w            <= 0     ) ||  (h             <= 0      ) ||
+      (x1           >= _width) ||  (y1            >= _height) ||
+     ((x2 = x1+w-1) <  0     ) || ((y2  = y1+h-1) <  0      )) return;
+  if(x1 < 0) { // Clip left
+    w += x1;
+    x1 = 0;
+  }
+  if(y1 < 0) { // Clip top
+    h += y1;
+    y1 = 0;
+  }
+  if(x2 >= _width) { // Clip right
+    x2 = _width - 1;
+    w  = x2 - x1 + 1;
+  }
+  if(y2 >= _height) { // Clip bottom
+    y2 = _height - 1;
+    h  = y2 - y1 + 1;
+  }
+
+  setAddrWindow(x1, y1, x2, y2);
+  flood(fillcolor, (uint32_t)w * (uint32_t)h);
+  setAddrWindow(0, 0, _width - 1, _height - 1);
+  
+}
+
+void fillScreen(uint16_t color)
+{
+  
+  setAddrWindow(0, 0, _width - 1,  - 1);
+  flood(color, _height*_width );
+}
+
+void drawPixel(int16_t x, int16_t y, uint16_t color)
+{
+  // Clip
+    if((x < 0) || (y < 0) || (x >= _width) || (y >= _height))    return;
+    setAddrWindow(x, y, x+1, y+1);
+    lcdData(color); 
+    //writeRegister16(0x2C, color);
+  
+}
+
+void pulseWR(void) {
+  digitalWrite(PA13,LOW);  //WR
+  delayMicroseconds(10);
+  digitalWrite(PA13,HIGH);  
+  }
+
+inline void writeCommand(uint16_t c)
+{
+  CS_ACTIVE_CD_COMMAND;
+  wrBus(c>>8);
+  wrBus(c);
+}
+
+void writeRegister8(uint16_t a, uint8_t d)
+{
+  writeCommand(a);
+  //CD_DATA;
+  wrBus(d);
+  digitalWrite(PA15,1);
+}
+
+void writeRegister16(uint16_t a, uint16_t d)
+{
+  writeCommand(a);
+  //CD_DATA;
+  wrBus(d>>8);
+  wrBus(d);
+  digitalWrite(PA15,1);
+}
+
+
+void writeRegisterPair(uint16_t aH, uint16_t aL, uint16_t d)
+{
+  writeRegister8(aH, d>>8);
+  writeRegister8(aL, d);
+}
+
+*/

@@ -19,12 +19,12 @@
 
 //Control pins |RD |WR |RS |CS |RST|
 #define TFT_CNTRL_PORT	GPIOA
-#define TFT_RD			PA0
+//#define TFT_RD			PA0
 #define TFT_WR			PA13
 #define TFT_RS			PA14
 #define TFT_CS			PA15
 
-#define TFT_RD_MASK		BIT0 // digitalPinToBitMask(TFT_RD) // 
+//#define TFT_RD_MASK		BIT0 // digitalPinToBitMask(TFT_RD) // 
 #define TFT_WR_MASK		BIT13 // digitalPinToBitMask(TFT_WR) // 
 #define TFT_RS_MASK		BIT14 // digitalPinToBitMask(TFT_RS) // 
 #define TFT_CS_MASK		BIT15 // digitalPinToBitMask(TFT_CS) // 
@@ -56,8 +56,8 @@
 #define WHITE   0xFFFF
 
 
-	#define RD_ACTIVE    digitalWrite(TFT_RD, LOW)
-	#define RD_IDLE      digitalWrite(TFT_RD, HIGH)
+	//#define RD_ACTIVE    digitalWrite(TFT_RD, LOW)
+	//#define RD_IDLE      digitalWrite(TFT_RD, HIGH)
 #if SLOW_WRITE
 	// use old definition, standard bit toggling, low speed
 	#define WR_ACTIVE    digitalWrite(TFT_WR, LOW)
@@ -81,15 +81,12 @@ extern gpio_reg_map * cntrlRegs;
 
 #define WR_STROBE { WR_ACTIVE; WR_IDLE; }
 
-extern uint8_t read8_(void);
-#define read8(x) ( x = read8_() )
-
 extern gpio_reg_map * dataRegs;
 
 #if (TFT_DATA_SHIFT==0)
   //#warning "Using lower data nibble..."
 	// set the pins to input mode
-	#define setReadDir() ( dataRegs->CRL = 0x88888888 )	// set the lower 8 bits as input
+	//#define setReadDir() ( dataRegs->CRL = 0x88888888 )	// set the lower 8 bits as input
 	// set the pins to output mode
 	#define setWriteDir() ( dataRegs->CRL = 0x33333333 )	// set the lower 8 bits as output
 
@@ -112,7 +109,7 @@ extern gpio_reg_map * dataRegs;
 #elif (TFT_DATA_SHIFT==8)
   #warning "Using high data nibble..."
 	// set the pins to input mode
-	#define setReadDir() ( dataRegs->CRH = 0x88888888 )	// set the upper 8 bits as input
+	//#define setReadDir() ( dataRegs->CRH = 0x88888888 )	// set the upper 8 bits as input
 	// set the pins to output mode
 	#define setWriteDir() ( dataRegs->CRH = 0x33333333 )	// set the lower 8 bits as output
 
@@ -184,8 +181,6 @@ class Adafruit_TFTLCD_8bit_STM32 : public Adafruit_GFX {
   uint8_t  driver;
 };
 
-extern uint16_t readReg(uint8_t r);
-extern uint32_t readReg32(uint8_t r);
 extern void writeCommand(uint16_t c);
 extern void writeRegister8(uint16_t a, uint8_t d);
 extern void writeRegister16(uint16_t a, uint16_t d);

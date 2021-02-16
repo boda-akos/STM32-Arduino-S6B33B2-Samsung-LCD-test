@@ -31,10 +31,10 @@ void s6b_begin(void)
   wrBus(0x2c); delay(10); // LCDWriteCommand( 0x2C);delay_1ms(20);------set OTP mode off---------
   wrBus(0xea); delay(10);
   wrBus2(0x02,0x01);delay(10);//------set internal osc on---------LCDWriteCommand( 0x02);LCDWriteCommand( 0x01); 
-  wrBus2(0x26,0x01);delay(10);//------booster1 on---------------LCDWriteCommand( 0x26);LCDWriteCommand( 0x01);
-  wrBus2(0x26,0x09);delay(10);//------booster1 on and amp on---------LCDWriteCommand( 0x26);LCDWriteCommand( 0x09);
-  wrBus2(0x26,0x0B);delay(10);//------booster2 on-------------LCDWriteCommand( 0x26); LCDWriteCommand( 0x0b);
-  wrBus2(0x26,0x0F);delay(10);//------booster3 on-------------LCDWriteCommand( 0x26);LCDWriteCommand( 0x0f);
+  wrBus2(0x26,0x01);delay(20);//------booster1 on---------------LCDWriteCommand( 0x26);LCDWriteCommand( 0x01);
+  wrBus2(0x26,0x09);delay(20);//------booster1 on and amp on---------LCDWriteCommand( 0x26);LCDWriteCommand( 0x09);
+  wrBus2(0x26,0x0B);delay(20);//------booster2 on-------------LCDWriteCommand( 0x26); LCDWriteCommand( 0x0b);
+  wrBus2(0x26,0x0F);delay(20);//------booster3 on-------------LCDWriteCommand( 0x26);LCDWriteCommand( 0x0f);
    //rotate 0x10 ,  adjust 0x42 together +3 
    //Register 0x10 DB0 also matters - see s6b33b3 pdf . For rotate, 0x40 bit 0x02 is in effect as well
   wrBus2(0x10,0x22);delay(10);//------LCDWriteCommand( 0x10);LCDWriteCommand( 0x21);//FL side 0x22 L,0x25 R
@@ -50,12 +50,12 @@ void s6b_begin(void)
   wrBus2(0x36,0x00);delay(10);//------Low frequency set off-------LCDWriteCommand( 0x36);LCDWriteCommand( 0x00);
   wrBus2(0x45,0x00);delay(10);//------ram skip area set no skip------LCDWriteCommand( 0x45);LCDWriteCommand(  0x00);
   wrBus2(0x40,0x00);delay(10);//------entry mode set : x addr incr, read modify write off--LCDWriteCommand( 0x40);LCDWriteCommand( 0x00);
-  wrBus3(0x42,0x03,162);delay(10);//------x address set from 00 to 159--------LCDWriteCommand( 0x42);LCDWriteCommand( 0x00);LCDWriteCommand( 0x9F);  
+  wrBus3(0x42,0x02,161);delay(10);//------x address set from 00 to 159--------LCDWriteCommand( 0x42);LCDWriteCommand( 0x00);LCDWriteCommand( 0x9F);  
   wrBus3(0x43,0x00,127);delay(10);//------y address set from 00 to 127--------LCDWriteCommand( 0x43);LCDWriteCommand( 0x00);LCDWriteCommand( 0x7F);  
   wrBus2(0x55,0x00);delay(10);//------partial display mode off-------LCDWriteCommand( 0x55);LCDWriteCommand( 0x00);
   wrBus2(0x53,0x00);delay(10);//------normal display---------LCDWriteCommand( 0x53);LCDWriteCommand( 0x00);
   wrBus2(0x5A,0x00);delay(10);//-------Scroll start line Set------- LCDWriteCommand(0x5A);LCDWriteCommand( 0x00);
-  wrBus(0x51);delay(10); //------display on set--------delay_1ms(20);LCDWriteCommand( 0x51);
+  wrBus(0x51);delay(300); //------display on set--------delay_1ms(20);LCDWriteCommand( 0x51);
   digitalWrite(PA15,1); //CS
   digitalWrite(PA14,1); //RS
 }
