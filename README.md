@@ -20,8 +20,9 @@ The zip-ed file contains the previous version, it can only do limited graphics.
 
   digitalWrite(PB2,0);  //Reset
   digitalWrite(PA15,0); //CS
-  digitalWrite(PA14,0); //RS
-  digitalWrite(PA13,1); //WR  
+  digitalWrite(PA14,0); //RS   disableDebugPorts sets free these 3 pins !
+  digitalWrite(PA13,1); //WR   If you use SWD or Jtag, take other pins.
   
   PB8-PB15 Data bus D0-D7
 
+STM32 IDE : rogerclarkmelbourne on Github
