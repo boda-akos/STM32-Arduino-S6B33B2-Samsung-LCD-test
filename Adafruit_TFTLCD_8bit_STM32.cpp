@@ -182,7 +182,7 @@ void Adafruit_TFTLCD_8bit_STM32::drawPixel(int16_t x, int16_t y, uint16_t color)
 {
   // Clip
     if((x < 0) || (y < 0) || (x >= _width) || (y >= _height)) return;
-    setAddrWindow(x, y, x, y);
+    setAddrWindow(x, y, x+1, y+1);
     CS_ACTIVE; CD_DATA;
     write8 (color >>8);
     write8 (color & 0x00ff); 
@@ -230,7 +230,7 @@ void Adafruit_TFTLCD_8bit_STM32::drawLin(int16_t x0, int16_t y0, int16_t x1, int
     } 
 }*/
 //=======================================
-// Draw an image bitmap (16bits per color) at the specified position from the provided buffer.
+// Draw an image bitmap (16bits per color) at the specified position from the provided buffer. Untested !!!
 //=======================================
 void Adafruit_TFTLCD_8bit_STM32::drawBitmap(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t * bitmap)
 {
@@ -254,7 +254,7 @@ void Adafruit_TFTLCD_8bit_STM32::drawBitmap(int16_t x, int16_t y, int16_t w, int
 // Issues 'raw' an array of 16-bit color values to the LCD; used
 // externally by BMP examples.  Assumes that setWindowAddr() has
 // previously been set to define the bounds.  Max 255 pixels at
-// a time (BMP examples read in small chunks due to limited RAM).
+// a time (BMP examples read in small chunks due to limited RAM). Untested !!!
 //=======================================
 void Adafruit_TFTLCD_8bit_STM32::pushColors(uint16_t *data, int16_t len, boolean first)
 {
